@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 const PORT = 5000;
@@ -24,7 +25,7 @@ app.get("/api/user", (req, res) => {
   const { id } = req.query;
   const user = users.find((user) => user.id === parseInt(id, 10));
   if (!user) {
-    res.json({ message: "User not found", user: null });
+    return res.json({ message: "User not found", user: null });
   }
   res.status(200).json({ user: user });
 });
@@ -68,7 +69,7 @@ app.post("/api/appointments", (req, res) => {
 
   const newTaskForUser = {
     id: tasks.length + 1,
-    userId,
+    userId: parseInt(userId),
     title: "Appointment",
     ...appointment,
     appointmentId,
@@ -77,14 +78,14 @@ app.post("/api/appointments", (req, res) => {
 
   const newTaskForRecipient = {
     id: tasks.length + 1,
-    userId: recipientId,
+    userId: parseInt(recipientId),
     title: "Appointment",
     ...appointment,
     appointmentId,
   };
   tasks.push(newTaskForRecipient);
 
-  res.status(201).json(newAppointment);
+  res.status(201).json({ newAppointment, tasks });
 });
 
 app.listen(PORT, () => {
